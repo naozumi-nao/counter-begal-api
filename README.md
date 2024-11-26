@@ -17,13 +17,12 @@ http://localhost:3000
   - `Content-Type: application/json`
 
 - Request Body
-  - `id` as `string`
-  - `name` as `string`
-  - `description` as `string`
-  - `city` as `string`
+  - `name` as `String`
+  - `description` as `String`
+  - `city` as `String`
   - `photo` as `file`, max 2 MB
-  - `longitude` as `float`
-  - `latitude` as `float`
+  - `longitude` as `Number`
+  - `latitude` as `Number`
 
 - Response example
 ```json
@@ -48,7 +47,7 @@ http://localhost:3000
   "message": "Success",
   "reports": [
     {
-      "id": "begal-12345",
+      "_id": "begal-12345",
       "name": "Bima Adityo Kurniawan",
       "description": "Begal activity seen around Indomaret",
       "city": "Semarang",
@@ -75,7 +74,7 @@ http://localhost:3000
   "error": "false",
   "message": "Success",
   "report": {
-      "id": "begal-12345",
+      "_id": "begal-12345",
       "name": "Bima Adityo Kurniawan",
       "description": "Begal activity seen around Indomaret",
       "city": "Semarang",

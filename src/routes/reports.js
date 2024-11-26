@@ -1,21 +1,26 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Report = require('../models/report.js');
+const Report = require("../models/report.js");
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const reports = await Report.find();
-    res.status(200).json(reports);
+    const responseWrapper = {
+      error: false,
+      message: "Successfully fetched reports list from the api",
+      reports: reports
+    }
+    res.status(200).json(responseWrapper);
   } catch(error) {
     res.status(500).json({ message: error.message })
   }
 });
 
-router.get('/:id', getReport, (req, res) => {
+router.get("/:id", getReport, (req, res) => {
   res.json(res.report);
 });
 
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   const report = new Report({
     name: req.body.name,
     description: req.body.description,
@@ -25,21 +30,31 @@ router.post('/', async (req, res) => {
     lat: req.body.lat,
     createdAt: Date.now()
   })
+  const responseWrapper = {
+    error: false,
+    message: "Successfully added new report",
+  }
   try {
-    const newReport = await report.save();
-    res.status(201).json(newReport);
+    await report.save();
+    res.status(201).json(responseWrapper);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-router.patch('/:id', getReport, (req, res) => {
-  // N/A
+router.patch("/:id", getReport, (req, res) => {
+  // TODO
 });
 
-router.delete('/:id', getReport, async (req, res) => {
+router.delete("/:id", getReport, async (req, res) => {
   try {
-    await res.report.remove();
+    await res.report.deleteOne();
+    res.status(204).json(
+      { 
+        error: false,
+        message: "Report successfully deleted" 
+      }
+    );
   } catch(error) {
     res.status(500).json({ message: error.message });
   }
@@ -49,8 +64,8 @@ async function getReport(req, res, next) {
   let report;
   try {
     report = await Report.findById(req.params.id);
-    if (report == '') {
-      return res.status(404).json({ message: 'Cannot find report' });
+    if (report == "") {
+      return res.status(404).json({ message: "Cannot find report" });
     }
   } catch(error) {
     return res.status(500).json({ message: error.message });

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const reportSchema = new mongoose.Schema({
   name: {
@@ -18,11 +18,11 @@ const reportSchema = new mongoose.Schema({
     required: true
   },
   lon: {
-    type: String,
+    type: Number,
     required: true
   },
   lat: {
-    type: String,
+    type: Number,
     required: true
   },
   createdAt: {
@@ -32,4 +32,4 @@ const reportSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Report', reportSchema);
+module.exports = mongoose.model("Report", reportSchema);

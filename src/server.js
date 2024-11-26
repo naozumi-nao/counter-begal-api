@@ -1,20 +1,20 @@
-//require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+//require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 const app = express();
 const PORT = 3000;
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-mongoose.connect('mongodb://localhost/reports');
+mongoose.connect("mongodb://localhost/reports");
 const db = mongoose.connection;
-db.on('error', (error) => console.error(error));
-db.once('open', () => console.log('Connected to Mongo Database'));
+db.on("error", (error) => console.error(error));
+db.once("open", () => console.log("Connected to Mongo Database"));
 
 app.use(express.json());
 app.use(cors());
 
-const reportsRouter = require('./routes/reports.js');
-app.use('/reports', reportsRouter);
+const reportsRouter = require("./routes/reports.js");
+app.use("/reports", reportsRouter);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)
