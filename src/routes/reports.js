@@ -35,7 +35,6 @@ router.get("/", async (req, res) => {
 router.post("/", upload.single("image-file"), async (req, res) => {
   const file = req.file;
   const imgName = generateRandomFileName();
-  console.log(imgName);
 
   const fileBuffer = await sharp(file.buffer)
     .resize({ height: 480, width: 480, fit: "cover" })
@@ -52,9 +51,6 @@ router.post("/", upload.single("image-file"), async (req, res) => {
   })
 
   try {
-    console.log(req.file);
-    console.log(report);
-
     await uploadFile(fileBuffer, imgName, file.mimetype);
     await report.save();
 

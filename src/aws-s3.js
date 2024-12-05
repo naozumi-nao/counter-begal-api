@@ -26,11 +26,6 @@ export function uploadFile(fileBuffer, fileName, mimetype) {
     ContentType: mimetype
   }
 
-  console.log(bucketName);
-  console.log(region);
-  console.log(accessKeyId);
-  console.log(secretAccessKey);
-
   return s3Client.send(new PutObjectCommand(uploadParams));
 };
 
