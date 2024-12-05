@@ -19,7 +19,6 @@ const reportSchema = new mongoose.Schema({
   },
   photoUrl: {
     type: String,
-    required: true
   },
   lon: {
     type: Number,

@@ -1,45 +1,24 @@
 import express from "express";
 import Report from "../models/report.js";
-import dotenv from "dotenv";
 
 import multer from "multer";
 import crypto from "crypto";
 import sharp from "sharp";
-
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { S3Client, PutObjectCommand ,GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-
-dotenv.config();
-
-const imageNameRandomizer = (bytes = 32) => {
-  crypto.randomBytes().toString('hex');
-};
-
-const s3 = new S3Client({
-  credentials: {
-    accessKeyId: process.env.ACCESS_KEY,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY,
-  },
-  region: process.env.BUCKET_REGION
-});
+import { deleteFile, getObjectSignedUrl, uploadFile } from "../aws-s3.js";
 
 const router = express.Router();
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
+const generateRandomFileName = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
 
 router.get("/", async (req, res) => {
   try {
     const reports = await Report.find();
-
-    for (const report of reports) {
-      const getObjectParams = {
-        Bucket: process.env.BUCKET_NAME,
-        Key: report.photoName,
+    if(reports) {
+      for (let report of reports) {
+        report.photoUrl = await getObjectSignedUrl(report.photoName);
       }
-      const command = new GetObjectCommand(getObjectParams);
-      const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-      report.photoUrl = url;
     }
 
     const responseWrapper = {
@@ -53,36 +32,36 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", upload.single("report-image"), async (req, res) => {
-  const responseWrapper = {
-    error: false,
-    message: "Successfully added new report",
-  }
+router.post("/", upload.single("image-file"), async (req, res) => {
+  const file = req.file;
+  const imgName = generateRandomFileName();
+  console.log(imgName);
 
-  const buffer = await sharp(req.file.buffer).resize({ height: 480, width: 480, fit: "contain" }).toBuffer();
-  const imgName = imageNameRandomizer();
-  const params = {
-    Bucket: process.env.BUCKET_NAME,
-    Key: imgName,
-    Body: buffer,
-    ContentType: req.file.mimetype,
-  }
-  const command = new PutObjectCommand(params)
+  const fileBuffer = await sharp(file.buffer)
+    .resize({ height: 480, width: 480, fit: "cover" })
+    .toBuffer();
 
   const report = new Report({
     name: req.body.name,
     description: req.body.description,
     city: req.body.city,
     photoName: imgName,
-    //photoUrl: req.body.photoUrl,
     lon: req.body.lon,
     lat: req.body.lat,
     createdAt: Date.now()
   })
 
   try {
-    await s3.send(command);
+    console.log(req.file);
+    console.log(report);
+
+    await uploadFile(fileBuffer, imgName, file.mimetype);
     await report.save();
+
+    const responseWrapper = {
+      error: false,
+      message: "Successfully added new report",
+    }
     res.status(201).json(responseWrapper);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -98,14 +77,8 @@ router.patch("/:id", getReport, (req, res) => {
 });
 
 router.delete("/:id", getReport, async (req, res) => {
-  const params = {
-    Bucket: process.env.BUCKET_NAME,
-    Key: res.report.photoName
-  }
-  const command = new DeleteObjectCommand(params);
-
   try {
-    await s3.send(command);
+    await deleteFile(res.report.photoName);
     await res.report.deleteOne();
     res.status(204).json(
       { 
