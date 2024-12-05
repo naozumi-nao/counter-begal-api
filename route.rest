@@ -1,0 +1,19 @@
+GET http://localhost:3000/reports
+
+###
+
+GET http://localhost:3000/reports/6746f747f1831253506e36c7
+
+###
+
+POST http://localhost:3000/reports
+Content-Type: application/json
+
+{
+    "name": "Bima Adityo Kurniawan",
+    "description": "Begal activity seen around Indomaret",
+    "city": "Semarang",
+    "photoUrl": "https://images.pexels.com/photos/13268478/pexels-photo-13268478.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    "lon": 106.761429,
+    "lat": -6.547753
+}
