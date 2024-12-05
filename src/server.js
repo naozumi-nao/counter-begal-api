@@ -5,8 +5,12 @@ import reportsRouter from "./routes/reports.js";
 
 const app = express();
 const PORT = 3000;
+import dotenv from "dotenv";
 
-mongoose.connect("mongodb://localhost/reports");
+dotenv.config();
+
+const uri = process.env.DATABASE_URL;
+mongoose.connect(uri);
 const db = mongoose.connection;
 db.on("error", (error) => console.error(error));
 db.once("open", () => console.log("Connected to Mongo Database"));
