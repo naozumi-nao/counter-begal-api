@@ -17,3 +17,7 @@ Content-Type: application/json
     "lon": 106.761429,
     "lat": -6.547753
 }
+
+###
+
+DELETE http://localhost:3000/reports/6746f747f1831253506e36c7

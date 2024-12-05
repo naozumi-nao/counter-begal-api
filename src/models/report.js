@@ -13,6 +13,10 @@ const reportSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  photoName: {
+    type: String,
+    required: true
+  },
   photoUrl: {
     type: String,
     required: true
